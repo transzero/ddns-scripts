@@ -131,18 +131,18 @@ update_namesilo() {
         fi
         if [ "$retcode" ]; then
             local has_value=$(printf "%s\n" "$RESPONSE" |
-                _egrep_o "<host>$domain</host><value>$__IP</value>")
+                _egrep_o "<host>$RRHOST</host><value>$__IP</value>")
             if [ "$has_value" ]; then
                 write_log 4 "Skip this time since your device IP is the same as NameSilo recorded"
                 return 0
             else
                 RRID=$(printf "%s\n" "$RESPONSE" |
-                    _egrep_o "<record_id>([^<]*)</record_id><type>$RRTYPE</type><host>$domain</host>" |
+                    _egrep_o "<record_id>([^<]*)</record_id><type>$RRTYPE</type><host>$RRHOST</host>" |
                     _egrep_o "<record_id>([^<]*)</record_id>" |
                     sed -r "s/<record_id>([^<]*)<\/record_id>/\1/" | tail -n 1)
                 if [ -z "$RRTTL" ]; then
                     RRTTL=$(printf "%s\n" "$RESPONSE" |
-                        _egrep_o "<host>$domain</host><value>$__IP</value><ttl>([^<]*)</ttl>" |
+                        _egrep_o "<host>$RRHOST</host><value>$__IP</value><ttl>([^<]*)</ttl>" |
                         _egrep_o "<ttl>([^<]*)</ttl>" | sed -r "s/<ttl>([^<]*)<\/ttl>/\1/" | tail -n 1)
                 fi
                 write_log 7 "Successfully retrieved the record id from NameSilo"
